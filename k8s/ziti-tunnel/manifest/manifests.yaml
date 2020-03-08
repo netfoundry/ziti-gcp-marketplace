@@ -1,0 +1,68 @@
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: $APP_INSTANCE_NAME-enroller-job
+  labels:
+    app.kubernetes.io/name: $APP_INSTANCE_NAME
+    app.kubernetes.io/component: ziti-tunnel-enroller
+spec:
+  template:
+    spec:
+      serviceAccountName: $ZITI_ENROLLER_SERVICE_ACCOUNT
+      containers:
+        - name: ziti-ott-enroller
+          image: $IMAGE_ZITI_ENROLLER
+          imagePullPolicy: Always
+          env:
+            - name: NF_REG_NAME
+              value: $APP_INSTANCE_NAME
+            - name: ZITI_ENROLLMENT_TOKEN
+              value: $ZITI_ENROLLMENT_TOKEN
+            - name: SECRET_NAME
+              value: $APP_INSTANCE_NAME-identity
+            - name: NAMESPACE
+              value: $NAMESPACE
+      restartPolicy: Never
+---
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: $APP_INSTANCE_NAME-daemonset
+  labels: &DaemonSetLabels
+    app.kubernetes.io/name: $APP_INSTANCE_NAME
+    app.kubernetes.io/component: ziti-tunnel-instance
+spec:
+  selector:
+    matchLabels: *DaemonSetLabels
+  template:
+    metadata:
+      labels: *DaemonSetLabels
+    spec:
+      serviceAccountName: $ZITI_TUNNEL_SERVICE_ACCOUNT
+      containers:
+        - name: ziti-tunnel
+          image: $IMAGE_ZITI_TUNNEL
+          imagePullPolicy: Always
+          args: ["run", "--resolver", "none"]
+          env:
+            - name: NF_REG_NAME
+              value: $APP_INSTANCE_NAME
+          volumeMounts:
+            - mountPath: /netfoundry
+              name: ziti-tunnel-config
+              readOnly: true
+            - mountPath: /dev/net/tun
+              name: dev-net-tun
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+      hostNetwork: true
+      restartPolicy: Always
+      volumes:
+        - name: ziti-tunnel-config
+          secret:
+            secretName: $APP_INSTANCE_NAME-identity
+        - name: dev-net-tun
+          hostPath:
+            path: /dev/net/tun

@@ -1,0 +1,52 @@
+---
+application_api_version: v1beta1
+properties:
+  ZITI_ENROLLMENT_TOKEN:
+    type: string
+    description: The one-time enrollment token that you receieved from NetFoundry.
+  APP_INSTANCE_NAME:
+    type: string
+    x-google-marketplace:
+      type: NAME
+  NAMESPACE:
+    type: string
+    x-google-marketplace:
+      type: NAMESPACE
+  IMAGE_ZITI_TUNNEL:
+    type: string
+    default: $REGISTRY/ziti-tunnel:$TAG
+    x-google-marketplace:
+      type: IMAGE
+  IMAGE_ZITI_ENROLLER:
+    type: string
+    default: $REGISTRY/ziti-tunnel/enroller:$TAG
+    x-google-marketplace:
+      type: IMAGE
+  SERVICE_ACCOUNT_ZITI_ENROLLER:
+    type: string
+    title: Service account used by enroller job.
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        roles:
+          - type: Role
+            rulesType: CUSTOM
+            rules:
+              - apiGroups: [""]
+                resources: ["secrets"]
+                verbs: ["create"]
+              - apiGroups: [""]
+                resources: ["secrets"]
+                resourceNames: ["$APP_INSTANCE_NAME-identity"]
+                verbs: ["get"]
+required:
+- ZITI_ENROLLMENT_TOKEN
+- APP_INSTANCE_NAME
+- NAMESPACE
+- IMAGE_ZITI_TUNNEL
+- ZITI_TUNNEL_SERVICE_ACCOUNT
+- IMAGE_ZITI_ENROLLER
+- ZITI_ENROLLER_SERVICE_ACCOUNT
+# REGISTRY=gcr.io/netfoundry-marketplace-dev
+# TAG=0.5.8-2554
+# TAG=0.9.0-44
