@@ -1,5 +1,5 @@
-#TAG = 0.5.8-2554# for MOP compatibility
-TAG ?= 0.9.0-44
+ZITI_VERSION ?= 0.9.0-44
+TAG ?= 0.9
 REGISTRY ?= gcr.io/netfoundry-marketplace-dev
 
 MARKETPLACE_TOOLS_TAG := 0.9.10
@@ -8,26 +8,10 @@ $(info ---- REGISTRY = $(REGISTRY))
 $(info ---- TAG = $(TAG))
 
 APP_DEPLOYER_IMAGE ?= $(REGISTRY)/ziti-tunnel/deployer:$(TAG)
-NAME ?= ziti-tunnel-1
-
-ifdef IMAGE_ZITI_TUNNEL
-  IMAGE_ZITI_TUNNEL_FIELD = , "IMAGE_ZITI_TUNNEL": "$(IMAGE_ZITI_TUNNEL)"
-endif
-
-#ifdef ZITI_TUNNEL_PARAMETER1
-#  ZITI_TUNNEL_PARAMETER1_FIELD = , "ZITI_TUNNEL_PARAMETER1": "$(ZITI_TUNNEL_PARAMETER1)"
-#endif
-
-APP_PARAMETERS ?= { \
-  "APP_INSTANCE_NAME": "$(NAME)", \
-  "NAMESPACE": "$(NAMESPACE)" \
-  $(IMAGE_ZITI_TUNNEL_FIELD) \
-  $(ZITI_TUNNEL_PARAMETER1_FIELD) \
-}
-
-
 TESTER_IMAGE ?= $(REGISTRY)/ziti-tunnel/tester:$(TAG)
-
+IMAGE_ZITI_TUNNEL ?= $(REGISTRY)/ziti-tunnel:$(TAG)
+IMAGE_ZITI_TEST_CONTROLLER ?= $(REGISTRY)/ziti-tunnel/test-controller:$(TAG)
+IMAGE_ZITI_ENROLLER ?= $(REGISTRY)/ziti-tunnel/enroller:$(TAG)
 
 app/build:: .build/ziti-tunnel/deployer \
             .build/ziti-tunnel/ziti-tunnel \
@@ -57,9 +41,9 @@ app/build:: .build/ziti-tunnel/deployer \
 
 
 .build/ziti-tunnel/ziti-tunnel: | .build/ziti-tunnel
-	docker pull docker.io/netfoundry/ziti-tunnel:$(TAG)
-	docker tag docker.io/netfoundry/ziti-tunnel:$(TAG) "$(REGISTRY)/ziti-tunnel:$(TAG)"
-	docker push "$(REGISTRY)/ziti-tunnel:$(TAG)"
+	docker pull docker.io/netfoundry/ziti-tunnel:$(ZITI_VERSION)
+	docker tag docker.io/netfoundry/ziti-tunnel:$(ZITI_VERSION) "$(IMAGE_ZITI_TUNNEL)"
+	docker push "$(IMAGE_ZITI_TUNNEL)"
 	@touch "$@"
 
 
@@ -67,7 +51,7 @@ app/build:: .build/ziti-tunnel/deployer \
                              | .build/ziti-tunnel
 	docker build \
 	    --build-arg IMAGE_ZITI_TUNNEL=$(IMAGE_ZITI_TUNNEL) \
-	    --build-arg ZITI_VERSION=$(TAG) \
+	    --build-arg ZITI_VERSION=$(ZITI_VERSION) \
 	    --tag $(IMAGE_ZITI_ENROLLER) \
 	    images/enroller
 	docker push "$(IMAGE_ZITI_ENROLLER)"
@@ -77,7 +61,7 @@ app/build:: .build/ziti-tunnel/deployer \
 .build/ziti-tunnel/test-controller: $(shell find images/test-controller -type f) \
                              | .build/ziti-tunnel
 	docker build \
-	    --build-arg ZITI_VERSION=$(TAG) \
+	    --build-arg ZITI_VERSION=$(ZITI_VERSION) \
 	    --tag $(IMAGE_ZITI_TEST_CONTROLLER) \
 	    images/test-controller
 	docker push "$(IMAGE_ZITI_TEST_CONTROLLER)"
@@ -88,7 +72,7 @@ app/build:: .build/ziti-tunnel/deployer \
                           | .build/ziti-tunnel
 	$(call print_target,$@)
 	docker build \
-	    --build-arg ZITI_VERSION=$(TAG) \
+	    --build-arg ZITI_VERSION=$(ZITI_VERSION) \
 	    --tag "$(TESTER_IMAGE)" \
 	    apptest/tester
 	docker push "$(TESTER_IMAGE)"

@@ -11,7 +11,7 @@ metadata:
 spec:
   descriptor:
     type: Ziti Tunnel
-    version: '0.9.0-44'
+    version: '0.9'
     description: |-
       Ziti Tunnel connects your pods to Ziti services
     maintainers:
