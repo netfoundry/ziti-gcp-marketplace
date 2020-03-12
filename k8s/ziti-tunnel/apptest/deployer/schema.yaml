@@ -1,0 +1,14 @@
+properties:
+  testerImage:
+    type: string
+    default: $REGISTRY/tester:$TAG
+    x-google-property:
+      type: IMAGE
+  IMAGE_ZITI_TEST_CONTROLLER:
+    type: string
+    default: $REGISTRY/test-controller:$TAG
+    x-google-property:
+      type: IMAGE
+  ZITI_ENROLLMENT_TOKEN:
+    type: string
+    default: ""

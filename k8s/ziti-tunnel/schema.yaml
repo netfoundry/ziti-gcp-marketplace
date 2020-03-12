@@ -14,15 +14,20 @@ properties:
       type: NAMESPACE
   IMAGE_ZITI_TUNNEL:
     type: string
-    default: $REGISTRY/ziti-tunnel:$TAG
+    default: $REGISTRY:$TAG
     x-google-marketplace:
       type: IMAGE
+  ZITI_TUNNEL_SERVICE_ACCOUNT:
+    type: string
+    title: Service account used by ziti-tunnel.
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
   IMAGE_ZITI_ENROLLER:
     type: string
-    default: $REGISTRY/ziti-tunnel/enroller:$TAG
+    default: $REGISTRY/enroller:$TAG
     x-google-marketplace:
       type: IMAGE
-  SERVICE_ACCOUNT_ZITI_ENROLLER:
+  ZITI_ENROLLER_SERVICE_ACCOUNT:
     type: string
     title: Service account used by enroller job.
     x-google-marketplace:
@@ -34,11 +39,7 @@ properties:
             rules:
               - apiGroups: [""]
                 resources: ["secrets"]
-                verbs: ["create"]
-              - apiGroups: [""]
-                resources: ["secrets"]
-                resourceNames: ["$APP_INSTANCE_NAME-identity"]
-                verbs: ["get"]
+                verbs: ["create", "get", "patch"]
 required:
 - ZITI_ENROLLMENT_TOKEN
 - APP_INSTANCE_NAME
@@ -47,6 +48,3 @@ required:
 - ZITI_TUNNEL_SERVICE_ACCOUNT
 - IMAGE_ZITI_ENROLLER
 - ZITI_ENROLLER_SERVICE_ACCOUNT
-# REGISTRY=gcr.io/netfoundry-marketplace-dev
-# TAG=0.5.8-2554
-# TAG=0.9.0-44

@@ -1,5 +1,5 @@
-TAG = 0.5.8-2554# for MOP compatibility
-#TAG ?= 0.9.0-44
+#TAG = 0.5.8-2554# for MOP compatibility
+TAG ?= 0.9.0-44
 REGISTRY ?= gcr.io/netfoundry-marketplace-dev
 
 MARKETPLACE_TOOLS_TAG := 0.9.10
@@ -32,6 +32,7 @@ TESTER_IMAGE ?= $(REGISTRY)/ziti-tunnel/tester:$(TAG)
 app/build:: .build/ziti-tunnel/deployer \
             .build/ziti-tunnel/ziti-tunnel \
             .build/ziti-tunnel/enroller \
+            .build/ziti-tunnel/test-controller \
             .build/ziti-tunnel/tester
 
 
@@ -42,6 +43,7 @@ app/build:: .build/ziti-tunnel/deployer \
 .build/ziti-tunnel/deployer: deployer/* \
                        manifest/* \
                        schema.yaml \
+                       $(shell find apptest/deployer -type f) \
                        | .build/ziti-tunnel
 	docker build \
 	    --build-arg REGISTRY="$(REGISTRY)/ziti-tunnel" \
@@ -65,15 +67,29 @@ app/build:: .build/ziti-tunnel/deployer \
                              | .build/ziti-tunnel
 	docker build \
 	    --build-arg IMAGE_ZITI_TUNNEL=$(IMAGE_ZITI_TUNNEL) \
+	    --build-arg ZITI_VERSION=$(TAG) \
 	    --tag $(IMAGE_ZITI_ENROLLER) \
 	    images/enroller
 	docker push "$(IMAGE_ZITI_ENROLLER)"
 	@touch "$@"
 
 
+.build/ziti-tunnel/test-controller: $(shell find images/test-controller -type f) \
+                             | .build/ziti-tunnel
+	docker build \
+	    --build-arg ZITI_VERSION=$(TAG) \
+	    --tag $(IMAGE_ZITI_TEST_CONTROLLER) \
+	    images/test-controller
+	docker push "$(IMAGE_ZITI_TEST_CONTROLLER)"
+	@touch "$@"
+
+
 .build/ziti-tunnel/tester: $(shell find apptest -type f) \
                           | .build/ziti-tunnel
 	$(call print_target,$@)
-	cd apptest/tester && docker build --tag "$(TESTER_IMAGE)" .
+	docker build \
+	    --build-arg ZITI_VERSION=$(TAG) \
+	    --tag "$(TESTER_IMAGE)" \
+	    apptest/tester
 	docker push "$(TESTER_IMAGE)"
 	@touch "$@"

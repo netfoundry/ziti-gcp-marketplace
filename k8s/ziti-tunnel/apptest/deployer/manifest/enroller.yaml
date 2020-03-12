@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ziti-test-controller
+  labels:
+    app.kubernetes.io/name: $APP_INSTANCE_NAME
+    app: $APP_INSTANCE_NAME-ziti-test-controller
+spec:
+  ports:
+    - name: api
+      protocol: TCP
+      port: 1280
+  selector:
+    app: $APP_INSTANCE_NAME-ziti-test-controller
+---
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: $APP_INSTANCE_NAME-enroller-job
+  labels:
+    app.kubernetes.io/name: $APP_INSTANCE_NAME
+    app.kubernetes.io/component: ziti-tunnel-enroller
+spec:
+  template:
+    spec:
+      serviceAccountName: $ZITI_ENROLLER_SERVICE_ACCOUNT
+      containers:
+        - name: enroller
+          image: $IMAGE_ZITI_ENROLLER
+          imagePullPolicy: Always
+          env:
+            - name: NF_REG_NAME
+              value: $APP_INSTANCE_NAME
+            - name: SECRET_NAME
+              value: $APP_INSTANCE_NAME-identity
+            - name: NAMESPACE
+              value: $NAMESPACE
+          volumeMounts:
+            - mountPath: /run/secrets/netfoundry.io/controller-credentials
+              name: controller-credentials
+      restartPolicy: Never
+      volumes:
+        - name: controller-credentials
+          secret:
+            secretName: $APP_INSTANCE_NAME-controller-credentials
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: $APP_INSTANCE_NAME-controller-credentials
+  labels:
+    app.kubernetes.io/name: $APP_INSTANCE_NAME
+type: Opaque
+stringData:
+  username: admin
+  password: admin
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: $APP_INSTANCE_NAME-ziti-test-controller
+  labels:
+    app.kubernetes.io/name: $APP_INSTANCE_NAME
+    app: $APP_INSTANCE_NAME-ziti-test-controller
+spec:
+  selector:
+    matchLabels:
+      app: $APP_INSTANCE_NAME-ziti-test-controller
+  template:
+    metadata:
+      labels:
+        app: $APP_INSTANCE_NAME-ziti-test-controller
+    spec:
+      serviceAccountName: $ZITI_ENROLLER_SERVICE_ACCOUNT
+      containers:
+        - name: controller
+          image: $IMAGE_ZITI_TEST_CONTROLLER
+          imagePullPolicy: Always
+          env:
+            - name: NF_REG_NAME
+              value: $APP_INSTANCE_NAME
+            - name: NAMESPACE
+              value: $NAMESPACE
+          ports:
+            - containerPort: 1280
+              name: api
+          volumeMounts:
+            - mountPath: /run/secrets/netfoundry.io/controller-credentials
+              name: controller-credentials
+      volumes:
+        - name: controller-credentials
+          secret:
+            secretName: $APP_INSTANCE_NAME-controller-credentials

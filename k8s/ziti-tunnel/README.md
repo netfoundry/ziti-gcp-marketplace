@@ -135,8 +135,9 @@ Configure the container images:
 
 ```shell
 TAG=0.5.8-2554
-export IMAGE_ZITI_TUNNEL="marketplace.gcr.io/netfoundry/ziti-tunnel:${TAG}"
+export IMAGE_ZITI_TUNNEL="marketplace.gcr.io/netfoundry-marketplace-dev/ziti-tunnel:${TAG}"
 export IMAGE_ZITI_ENROLLER="marketplace.gcr.io/netfoundry/ziti-tunnel/enroller:${TAG}"
+export IMAGE_ZITI_TEST_CONTROLLER="marketplace.gcr.io/netfoundry/ziti-tunnel/test-conroller:${TAG}"
 ```
 
 The image above is referenced by

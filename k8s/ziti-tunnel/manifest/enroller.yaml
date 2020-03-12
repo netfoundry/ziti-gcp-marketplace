@@ -1,0 +1,25 @@
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: $APP_INSTANCE_NAME-enroller-job
+  labels:
+    app.kubernetes.io/name: $APP_INSTANCE_NAME
+    app.kubernetes.io/component: ziti-tunnel-enroller
+spec:
+  template:
+    spec:
+      serviceAccountName: $ZITI_ENROLLER_SERVICE_ACCOUNT
+      containers:
+        - name: ziti-ott-enroller
+          image: $IMAGE_ZITI_ENROLLER
+          imagePullPolicy: Always
+          env:
+            - name: NF_REG_NAME
+              value: $APP_INSTANCE_NAME
+            - name: ZITI_ENROLLMENT_TOKEN
+              value: $ZITI_ENROLLMENT_TOKEN
+            - name: SECRET_NAME
+              value: $APP_INSTANCE_NAME-identity
+            - name: NAMESPACE
+              value: $NAMESPACE
+      restartPolicy: Never
