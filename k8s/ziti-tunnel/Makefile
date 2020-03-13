@@ -20,7 +20,7 @@ app/build:: .build/ziti-tunnel/deployer \
             .build/ziti-tunnel/tester
 
 
-.build/ziti-tunnel: | .build
+.build/ziti-tunnel:
 	mkdir -p "$@"
 
 
@@ -40,14 +40,18 @@ app/build:: .build/ziti-tunnel/deployer \
 	@touch "$@"
 
 
-.build/ziti-tunnel/ziti-tunnel: | .build/ziti-tunnel
-	docker pull docker.io/netfoundry/ziti-tunnel:$(ZITI_VERSION)
-	docker tag docker.io/netfoundry/ziti-tunnel:$(ZITI_VERSION) "$(IMAGE_ZITI_TUNNEL)"
+.build/ziti-tunnel/ziti-tunnel: $(shell find images/ziti-tunnel) \
+                                | .build/ziti-tunnel
+	docker build \
+	    --build-arg ZITI_VERSION=$(ZITI_VERSION) \
+	    --tag $(IMAGE_ZITI_TUNNEL) \
+	    images/ziti-tunnel
 	docker push "$(IMAGE_ZITI_TUNNEL)"
 	@touch "$@"
 
 
-.build/ziti-tunnel/enroller: $(shell find images/enroller -type f) \
+.build/ziti-tunnel/enroller: .build/ziti-tunnel/ziti-tunnel \
+                             $(shell find images/enroller -type f) \
                              | .build/ziti-tunnel
 	docker build \
 	    --build-arg IMAGE_ZITI_TUNNEL=$(IMAGE_ZITI_TUNNEL) \
@@ -61,6 +65,7 @@ app/build:: .build/ziti-tunnel/deployer \
 .build/ziti-tunnel/test-controller: $(shell find images/test-controller -type f) \
                              | .build/ziti-tunnel
 	docker build \
+	    --build-arg IMAGE_ZITI_TUNNEL=$(IMAGE_ZITI_TUNNEL) \
 	    --build-arg ZITI_VERSION=$(ZITI_VERSION) \
 	    --tag $(IMAGE_ZITI_TEST_CONTROLLER) \
 	    images/test-controller

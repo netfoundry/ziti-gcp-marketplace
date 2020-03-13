@@ -1,4 +1,5 @@
-FROM debian:stable-slim as fetch-ziti-artifacts
+ARG IMAGE_ZITI_TUNNEL
+FROM $IMAGE_ZITI_TUNNEL as download
 # This build stage grabs artifacts that are copied into the final image.
 # It uses the same base as the final image to maximize docker cache hits.
 
@@ -22,11 +23,11 @@ RUN curl -fLSs -O https://storage.googleapis.com/kubernetes-release/release/v1.1
 #
 ################
 
-FROM debian:stable-slim
+FROM $IMAGE_ZITI_TUNNEL
 
-COPY --from=fetch-ziti-artifacts /tmp/ziti-controller /usr/local/bin
-COPY --from=fetch-ziti-artifacts /tmp/ziti /usr/local/bin
-COPY --from=fetch-ziti-artifacts /tmp/kubectl /usr/local/bin
+COPY --from=download /tmp/ziti-controller /usr/local/bin
+COPY --from=download /tmp/ziti /usr/local/bin
+COPY --from=download /tmp/kubectl /usr/local/bin
 COPY ./docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh
 
