@@ -8,9 +8,9 @@ RUN curl -L https://storage.googleapis.com/kubernetes-release/release/v1.17.0/bi
     chmod +x /bin/kubectl
 RUN curl -fLSs \
       -O "https://netfoundry.jfrog.io/netfoundry/ziti-release/ziti/amd64/linux/${ZITI_VERSION}/ziti.tar.gz" && \
-  tar -C /bin -xzf "ziti.tar.gz" && \
-  chmod +x /bin/ziti
-
+  tar -C /usr/local/bin -xzf "ziti.tar.gz" && \
+  chmod +x /usr/local/bin/ziti && \
+  rm ziti.tar.gz
 COPY ./docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh
 

@@ -4,8 +4,8 @@ REGISTRY ?= gcr.io/netfoundry-marketplace-dev
 
 MARKETPLACE_TOOLS_TAG := 0.9.10
 
-$(info ---- REGISTRY = $(REGISTRY))
-$(info ---- TAG = $(TAG))
+$(info "---- REGISTRY = $(REGISTRY)")
+$(info "---- TAG = $(TAG)")
 
 APP_DEPLOYER_IMAGE ?= $(REGISTRY)/ziti-tunnel/deployer:$(TAG)
 TESTER_IMAGE ?= $(REGISTRY)/ziti-tunnel/tester:$(TAG)
