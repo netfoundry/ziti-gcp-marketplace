@@ -10,10 +10,11 @@ For more information on Ziti, see the [Ziti overview](https://netfoundry.github.
 
 ## Prerequisites
 
-You'll need 
+Ziti Tunnel can be deployed to your cluster through the Google Cloud Platform Marketplace or
+from the command line. You'll need access to a Ziti Controller before deploying the Ziti Tunnel
+in your cluster regardless of which deployment method you choose.
 
-You'll need access to a Ziti Controller before deploying the Ziti Tunnel in your cluster. You can
-deploy your own Ziti Controller using the Ziti Edge Developer Edition.
+You can deploy your own Ziti Controller using the Ziti Edge Developer Edition:
 
 1. Complete the [Ziti Edge Developer Editon quickstart](https://netfoundry.github.io/ziti-doc/ziti/quickstarts/networks-overview.html).
 
@@ -119,10 +120,13 @@ for the app. The instance name will typically match the name of the Ziti identit
 was created in the prerequisites.
  
 In most cases, you can use the `default` namespace.
-
 ```shell
 export APP_INSTANCE_NAME=ziti-tunnel-1
 export NAMESPACE=default
+```
+
+Capture the enrollment token (JWT) for the identity that was created in the Ziti Controller:
+```bash
 export ZITI_ENROLLMENT_TOKEN=$(cat ~/Downloads/$APP_INSTANCE_NAME.jwt)
 ```
 
