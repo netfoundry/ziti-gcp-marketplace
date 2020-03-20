@@ -3,7 +3,8 @@ application_api_version: v1beta1
 properties:
   ZITI_ENROLLMENT_TOKEN:
     type: string
-    description: The one-time enrollment token that you receieved from NetFoundry.
+    title: Ziti enrollment token (JWT).
+    description: The contents of the one-time enrollment token (JWT) that you downloaded from your Ziti controller
   APP_INSTANCE_NAME:
     type: string
     x-google-marketplace:
@@ -19,7 +20,7 @@ properties:
       type: IMAGE
   ZITI_TUNNEL_SERVICE_ACCOUNT:
     type: string
-    title: Service account used by ziti-tunnel.
+    title: Service account used by ziti-tunnel
     x-google-marketplace:
       type: SERVICE_ACCOUNT
   IMAGE_ZITI_ENROLLER:
@@ -29,7 +30,7 @@ properties:
       type: IMAGE
   ZITI_ENROLLER_SERVICE_ACCOUNT:
     type: string
-    title: Service account used by enroller job.
+    title: Service account used by enroller job
     x-google-marketplace:
       type: SERVICE_ACCOUNT
       serviceAccount:
