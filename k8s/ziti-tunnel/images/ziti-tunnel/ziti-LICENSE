@@ -1,0 +1,10 @@
+--------------------------------------------------------------------------------
+Apache License 2.0    https://github.com/netfoundry/ziti-cmd/blob/master/LICENSE
+
+Applies to:
+- /usr/local/bin/ziti
+- /usr/local/bin/ziti-controller
+- /usr/local/bin/ziti-enroller
+- /usr/local/bin/ziti-tunnel
+--------------------------------------------------------------------------------
+

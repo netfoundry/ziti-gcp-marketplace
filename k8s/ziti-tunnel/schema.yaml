@@ -1,0 +1,51 @@
+---
+application_api_version: v1beta1
+properties:
+  ZITI_ENROLLMENT_TOKEN:
+    type: string
+    title: Ziti enrollment token (JWT).
+    description: The contents of the one-time enrollment token (JWT) that you downloaded from your Ziti controller
+  APP_INSTANCE_NAME:
+    type: string
+    x-google-marketplace:
+      type: NAME
+  NAMESPACE:
+    type: string
+    x-google-marketplace:
+      type: NAMESPACE
+  IMAGE_ZITI_TUNNEL:
+    type: string
+    default: $REGISTRY:$TAG
+    x-google-marketplace:
+      type: IMAGE
+  ZITI_TUNNEL_SERVICE_ACCOUNT:
+    type: string
+    title: Service account used by ziti-tunnel
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+  IMAGE_ZITI_ENROLLER:
+    type: string
+    default: $REGISTRY/enroller:$TAG
+    x-google-marketplace:
+      type: IMAGE
+  ZITI_ENROLLER_SERVICE_ACCOUNT:
+    type: string
+    title: Service account used by enroller job
+    x-google-marketplace:
+      type: SERVICE_ACCOUNT
+      serviceAccount:
+        roles:
+          - type: Role
+            rulesType: CUSTOM
+            rules:
+              - apiGroups: [""]
+                resources: ["secrets"]
+                verbs: ["create", "get", "patch"]
+required:
+- ZITI_ENROLLMENT_TOKEN
+- APP_INSTANCE_NAME
+- NAMESPACE
+- IMAGE_ZITI_TUNNEL
+- ZITI_TUNNEL_SERVICE_ACCOUNT
+- IMAGE_ZITI_ENROLLER
+- ZITI_ENROLLER_SERVICE_ACCOUNT
